@@ -1,0 +1,22 @@
+{
+  "name": "ihappy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicolasleal570/iHappy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nicolasleal570/iHappy/issues"
+  },
+  "homepage": "https://github.com/nicolasleal570/iHappy#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
