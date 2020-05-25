@@ -3,28 +3,57 @@ const router = express.Router();
 const User = require('../models/User');
 
 router.get('/', function (req, res) {
-    res.send('Hello Americania');
-  });
+  res.send('Hello Americania');
+});
 
 router.get('/specific', function (req, res) {
-    res.send('Hello Arawato');
-  });
+  res.send('Hello Arawato');
+});
 
-router.post('/', (req, res) => {
-  const user = new User({
-    name: req.body.name,
-    last_name: req.body.last_name,
-    cedula: req.body.cedula,
-    adress: req.body.adress,
-    public_name: req.body.public_name,
-    identification: req.body.identification,
-    bio: req.body.bio
-      
-  });
-  user.save().then(data=>{
-    res.json(data);
-  }).catch(err=>{
-    res.json({ message: err});
-  });
+router.post('/', async (req, res) => {
+
+  try {
+    // Destructuring de lo que manda el usuario
+    const {
+      name,
+      last_name,
+      cedula,
+      adress,
+      public_name,
+      identification,
+      bio
+    } = req.body
+
+    const user = await User.create({
+      name,
+      last_name,
+      cedula,
+      adress,
+      public_name,
+      identification,
+      bio
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: user
+    });
+
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(val => val.message);
+
+      return res.status(400).json({
+        success: false,
+        error: messages
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        error: 'Server Error'
+      });
+    }
+  }
+
 });
 module.exports = router;
