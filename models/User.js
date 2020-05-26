@@ -22,7 +22,9 @@ const UserSchema = mongoose.Schema({
         enum: ['Psicologo', 'Usuario']
     },
 
-    bio: String
+    bio: String,
+    speciality:  [{type: Schema.Types.ObjectId, ref: 'Especialidad'}],
+    tests:[{type: Schema.Types.ObjectId, ref: 'Test'}]
 })
 
 module.exports = mongoose.model('Users', UserSchema)

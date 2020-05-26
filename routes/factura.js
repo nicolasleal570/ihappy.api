@@ -1,13 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const Factura = require('../models/Factura');
 
 router.get('/', function (req, res) {
-  res.send('Hello Americania');
-});
-
-router.get('/specific', function (req, res) {
-  res.send('Hello Arawato');
+  res.send('Hello Factura');
 });
 
 router.post('/', async (req, res) => {
@@ -15,32 +11,24 @@ router.post('/', async (req, res) => {
   try {
     // Destructuring de lo que manda el usuario
     const {
-      name,
-      last_name,
-      cedula,
-      adress,
-      public_name,
-      identification,
-      bio,
-      speciality,
-      tests
+        id_psicologo,
+        id_usuario,
+        fecha,
+        total,
+        id_tarjeta
     } = req.body
 
-    const user = await User.create({
-      name,
-      last_name,
-      cedula,
-      adress,
-      public_name,
-      identification,
-      bio,
-      speciality,
-      tests
+    const factura = await Factura.create({
+        id_psicologo,
+        id_usuario,
+        fecha,
+        total,
+        id_tarjeta
     });
 
     return res.status(200).json({
       success: true,
-      data: user
+      data: factura
     });
 
   } catch (err) {

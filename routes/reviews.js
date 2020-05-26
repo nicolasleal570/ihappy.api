@@ -1,13 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const Reviews = require('../models/Reviews');
 
 router.get('/', function (req, res) {
-  res.send('Hello Americania');
-});
-
-router.get('/specific', function (req, res) {
-  res.send('Hello Arawato');
+  res.send('Hello Reviews');
 });
 
 router.post('/', async (req, res) => {
@@ -15,32 +11,24 @@ router.post('/', async (req, res) => {
   try {
     // Destructuring de lo que manda el usuario
     const {
-      name,
-      last_name,
-      cedula,
-      adress,
-      public_name,
-      identification,
-      bio,
-      speciality,
-      tests
+        id_psicologo,
+        id_usuario,
+        content,
+        created_at,
+        rating
     } = req.body
 
-    const user = await User.create({
-      name,
-      last_name,
-      cedula,
-      adress,
-      public_name,
-      identification,
-      bio,
-      speciality,
-      tests
+    const reviews = await Reviews.create({
+        id_psicologo,
+        id_usuario,
+        content,
+        created_at,
+        rating
     });
 
     return res.status(200).json({
       success: true,
-      data: user
+      data: reviews
     });
 
   } catch (err) {
