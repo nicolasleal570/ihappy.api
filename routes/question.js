@@ -11,12 +11,12 @@ router.post('/', async (req, res) => {
   try {
     // Destructuring de lo que manda el usuario
     const {
-        question,
+        title,
         answers
     } = req.body
 
     const question = await Question.create({
-      question,
+      title,
       answers
     });
 

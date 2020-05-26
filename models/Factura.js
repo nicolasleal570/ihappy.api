@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const FacturaSchema = mongoose.model.Schema({
+const FacturaSchema = mongoose.Schema({
     id_psicologo:{type: Schema.Types.ObjectId, ref: 'User'},
     id_usuario: {type: Schema.Types.ObjectId, ref: 'User'},
     fecha: Date,

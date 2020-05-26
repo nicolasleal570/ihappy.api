@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const Bank_accountsSchema = mongoose.model.Schema({
+const Bank_accountsSchema = mongoose.Schema({
 
     id_user: {type: Schema.Types.ObjectId, ref: 'User'},
     bank: String,

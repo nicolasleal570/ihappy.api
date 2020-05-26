@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const QuestionSchema = mongoose.model.Schema ({
-    question: String,
+const QuestionSchema = mongoose.Schema ({
+    title: String,
     answers: [{type: Schema.Types.ObjectId, ref: 'Choice' }],
 
 });
