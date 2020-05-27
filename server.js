@@ -35,7 +35,7 @@ if(process.env.NODE_ENV === 'development') {
 }
 
 //Routes
-app.use('/api/user', userRoute);
+app.use('/api/users', userRoute);
 app.use('/api/bank-accounts', bank_accountsRoute);
 app.use('/api/choice', choiceRoute);
 app.use('/api/conversation', conversationRoute);
