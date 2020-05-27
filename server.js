@@ -23,6 +23,7 @@ const reviewsRoute = require('./routes/reviews');
 const specialtyRoute = require('./routes/specialty');
 const testRoute = require('./routes/test');
 const userRoute = require('./routes/user');
+const roleRoute = require('./routes/roles');
 
 //Middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -34,7 +35,6 @@ if(process.env.NODE_ENV === 'development') {
 }
 
 //Routes
-// - User API
 app.use('/api/user', userRoute);
 app.use('/api/bank-accounts', bank_accountsRoute);
 app.use('/api/choice', choiceRoute);
@@ -44,6 +44,7 @@ app.use('/api/question', questionRoute);
 app.use('/api/reviews', reviewsRoute);
 app.use('/api/specialty', specialtyRoute);
 app.use('/api/test', testRoute);
+app.use('/api/roles', roleRoute);
 
 // Port
 const PORT = process.env.PORT || 3000;

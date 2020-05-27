@@ -2,46 +2,29 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 
-router.get('/', function (req, res) {
-  res.send('Hello Americania');
-});
-
-router.get('/specific', function (req, res) {
-  res.send('Hello Arawato');
-});
-
-router.post('/', async (req, res) => {
+router.post('/register', async (req, res) => {
 
   try {
     // Destructuring de lo que manda el usuario
-    const {
-      name,
-      last_name,
-      cedula,
-      adress,
-      public_name,
-      identification,
-      bio,
-      speciality,
-      tests
-    } = req.body
+    // const {
+    //   email,
+    //   username,
+    //   password1,
+    //   password2
+    // } = req.body
 
-    const user = await User.create({
-      name,
-      last_name,
-      cedula,
-      adress,
-      public_name,
-      identification,
-      bio,
-      speciality,
-      tests
-    });
+    // const user = await User.create({
+    //   email,
+    //   username,
+    //   password
+    // });
 
-    return res.status(200).json({
-      success: true,
-      data: user
-    });
+    // return res.status(200).json({
+    //   success: true,
+    //   data: user
+    // });
+
+    res.send('Hello World');
 
   } catch (err) {
     if (err.name === 'ValidationError') {
