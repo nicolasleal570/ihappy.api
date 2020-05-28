@@ -44,7 +44,7 @@ app.use('/api/conversation', conversationRoute);
 app.use('/api/factura', facturaRoute);
 app.use('/api/question', questionRoute);
 app.use('/api/reviews', reviewsRoute);
-app.use('/api/specialty', specialtyRoute);
+app.use('/api/specialities', specialtyRoute);
 app.use('/api/test', testRoute);
 app.use('/api/roles', roleRoute);
 

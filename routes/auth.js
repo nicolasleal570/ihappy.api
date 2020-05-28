@@ -19,6 +19,7 @@ router.post('/register', async (req, res) => {
 
         // Hashing Password
         const salt = await bcrypt.genSalt(10);
+        console.log(req.body, salt);
         const hashPassword = await bcrypt.hash(password, salt);
 
         const emailExist = await User.findOne({ email: email });

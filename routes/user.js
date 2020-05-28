@@ -107,6 +107,9 @@ router.put('/profile/:slug', isLoggedIn, async (req, res) => {
       });
     }
 
+    const newSpecialities = [...req.body.speciality];
+    console.log('newSpecialities ', newSpecialities);
+
     const newUser = await User.findOneAndUpdate({ slug }, { ...req.body }, { returnOriginal: false, useFindAndModify: false });
 
     return res.status(200).json({
