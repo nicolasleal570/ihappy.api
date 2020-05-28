@@ -4,7 +4,10 @@ module.exports = function (req, res, next) {
     const token = req.header('auth-token');
     
     if (!token) {
-        return res.status(401).json("Access Denied");
+        return res.status(401).json({
+            "success": false,
+            "error": "Access Denied"
+        });
     }
 
     try {

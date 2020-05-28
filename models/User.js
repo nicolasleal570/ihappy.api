@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
+const slug = require('mongoose-slug-generator');
 const Schema = mongoose.Schema;
+
+mongoose.plugin(slug);
 
 const UserSchema = mongoose.Schema({
     first_name: {
@@ -38,6 +41,7 @@ const UserSchema = mongoose.Schema({
         max: 1024,
         min: 6
     },
+    slug: { type: String, slug: ["first_name", "last_name", "username"] },
     role: {
         type: Schema.Types.ObjectId,
         ref: 'Role',
@@ -47,12 +51,12 @@ const UserSchema = mongoose.Schema({
         type: String,
         default: ''
     },
+    speciality: [{ type: Schema.Types.ObjectId, ref: 'Especialidad' }],
+    tests: [{ type: Schema.Types.ObjectId, ref: 'Test' }],
     created_at: {
         type: Date,
         default: Date.now
     },
-    speciality: [{ type: Schema.Types.ObjectId, ref: 'Especialidad' }],
-    tests: [{ type: Schema.Types.ObjectId, ref: 'Test' }]
 })
 
 module.exports = mongoose.model('User', UserSchema)

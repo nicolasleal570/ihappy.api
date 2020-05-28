@@ -1,97 +1,19 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../models/User');
 
-const verifyUser = require('../utils/verifyRoutes');
+const isLoggedIn = require('../utils/verifyProtectedRoutes');
 
-// @desc    Register new user
-// @route   POST /api/users/register/
+// @desc    List of profiles
+// @route   GET /api/users/
 // @access  Public
-router.post('/register', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    // Destructuring de lo que manda el usuario
-    const {
-      email,
-      username,
-      password,
-      role
-    } = req.body
+    const users = await User.find();
 
-    // Hashing Password
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(password, salt);
-
-    const emailExist = await User.findOne({ email: email });
-    if (emailExist) {
-      return res.status(400).json({ success: false, data: "Email already exists" })
-    }
-
-    const user = await User.create({
-      email,
-      username,
-      password: hashPassword,
-      role
-    });
-    
-    // Create JWT a token
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-
-    // Send a new token to the client (frontend)
-    res.header('auth-token', token).json({
-      success: true, 
-      token
-    });
-
-  } catch (err) {
-    if (err.name === 'ValidationError') {
-      const messages = Object.values(err.errors).map(val => val.message);
-
-      return res.status(400).json({
-        success: false,
-        error: messages
-      });
-    } else {
-      return res.status(500).json({
-        success: false,
-        error: 'Server Error ' + err
-      });
-    }
-  }
-
-});
-
-// @desc    Register new user
-// @route   POST /api/users/login/
-// @access  Public
-router.post('/login', async (req, res) => {
-  try {
-
-    const {
-      email,
-      password
-    } = req.body
-
-    // Validate if user exists
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res.status(400).json({ success: false, data: "User doesn't exists" })
-    }
-
-    // Validate password
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(400).json({ success: false, error: "Invalid password" });
-    }
-
-    // Create JWT a token
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-
-    // Send a new token to the client (frontend)
-    res.header('auth-token', token).json({
+    return res.status(200).json({
       success: true,
-      token
+      data: users
     });
 
   } catch (err) {
@@ -109,25 +31,96 @@ router.post('/login', async (req, res) => {
       });
     }
   }
+
 });
 
-// @desc    Look at the profile of the logged in user
-// @route   GET /api/users/profile/
-// @access  Private
-router.get('/profile', verifyUser, async (req, res) => {
+// @desc    Look an user profile
+// @route   GET /api/users/profile/:slug
+// @access  Public
+router.get('/profile/:slug', async (req, res) => {
+
   try {
+    const { slug } = req.params;
 
-    const { _id } = req.user
-    const user = await User.findById(_id);
+    if (!slug) {
+      return res.status(400).json({
+        success: false,
+        err
+      });
+    }
 
-    res.status(200).json({
+    const user = await User.findOne({ slug });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found.'
+      });
+    }
+
+    return res.status(200).json({
       success: true,
       data: user
     });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+
+});
+
+// @desc    Modify profile of logged user
+// @route   PUT /api/users/profile/:slug
+// @access  Private
+router.put('/profile/:slug', isLoggedIn, async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    // if the slug is null
+    if (!slug) {
+      return res.status(400).json({
+        success: false,
+        err
+      });
+    }
+
+    const user = await User.findOne({ slug });
+
+    // If user doesn't exists
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found.'
+      });
+    }
+
+    const requestedUserID = req.user._id + '';
+    const userID = user._id + ''
+
+    // If the user making the request is different from the profile
+    if (requestedUserID !== userID) {
+      return res.status(401).json({
+        success: false,
+        error: 'You doesn\'n have permissions to do this'
+      });
+    }
+
+    const newUser = await User.findOneAndUpdate({ slug }, { ...req.body }, { returnOriginal: false, useFindAndModify: false });
+
+    return res.status(200).json({
+      success: true,
+      data: newUser
+    });
 
   } catch (err) {
-
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
   }
-});
+})
+
 
 module.exports = router;

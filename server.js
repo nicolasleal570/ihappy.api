@@ -23,6 +23,7 @@ const reviewsRoute = require('./routes/reviews');
 const specialtyRoute = require('./routes/specialty');
 const testRoute = require('./routes/test');
 const userRoute = require('./routes/user');
+const authRoute = require('./routes/auth');
 const roleRoute = require('./routes/roles');
 
 //Middlewares
@@ -35,6 +36,7 @@ if(process.env.NODE_ENV === 'development') {
 }
 
 //Routes
+app.use('/api/auth', authRoute);
 app.use('/api/users', userRoute);
 app.use('/api/bank-accounts', bank_accountsRoute);
 app.use('/api/choice', choiceRoute);
