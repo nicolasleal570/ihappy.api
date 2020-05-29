@@ -1,21 +1,23 @@
-const jwt = require('jsonwebtoken');
+const jwt = require('jwt-simple');
+const moment = require('moment');
 
 module.exports = function (req, res, next) {
-    const token = req.header('auth-token');
+    if (!req.headers.authorization) {
+        return res
+            .status(403)
+            .send({ message: "Tu petición no tiene cabecera de autorización" });
+    }
+
+    const token = req.headers.authorization.split(" ")[1];
     
-    if (!token) {
-        return res.status(401).json({
-            "success": false,
-            "error": "Access Denied"
-        });
+    const payload = jwt.decode(token, process.env.TOKEN_SECRET);
+
+    if (payload.exp <= moment().unix()) {
+        return res
+            .status(401)
+            .send({ message: "El token ha expirado" });
     }
 
-    try {
-        const verified = jwt.verify(token, process.env.TOKEN_SECRET);
-        req.user = verified;
-        next();
-    } catch (error) {
-        return res.status(400).json('Invalid Token');
-    }
-
+    req.user = payload.sub;
+    next();
 }

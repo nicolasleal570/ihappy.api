@@ -1,8 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../models/User');
+const createToken = require('../utils/services');
 
 // @desc    Register new user
 // @route   POST /api/auth/register/
@@ -19,7 +19,6 @@ router.post('/register', async (req, res) => {
 
         // Hashing Password
         const salt = await bcrypt.genSalt(10);
-        console.log(req.body, salt);
         const hashPassword = await bcrypt.hash(password, salt);
 
         const emailExist = await User.findOne({ email: email });
@@ -35,10 +34,11 @@ router.post('/register', async (req, res) => {
         });
 
         // Create JWT a token
-        const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+        const token = createToken(user);
+        // const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
 
         // Send a new token to the client (frontend)
-        res.header('auth-token', token).json({
+        return res.status(200).json({
             success: true,
             token
         });
@@ -85,10 +85,11 @@ router.post('/login', async (req, res) => {
         }
 
         // Create JWT a token
-        const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+        // const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+        const token = createToken(user);
 
         // Send a new token to the client (frontend)
-        res.header('auth-token', token).json({
+        return res.status(200).json({
             success: true,
             token
         });

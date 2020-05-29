@@ -45,7 +45,7 @@ router.get('/profile/:slug', async (req, res) => {
     if (!slug) {
       return res.status(400).json({
         success: false,
-        err
+        error: 'The slug was not provide'
       });
     }
 
@@ -72,45 +72,28 @@ router.get('/profile/:slug', async (req, res) => {
 });
 
 // @desc    Modify profile of logged user
-// @route   PUT /api/users/profile/:slug
+// @route   PUT /api/users/profile
 // @access  Private
-router.put('/profile/:slug', isLoggedIn, async (req, res) => {
+router.put('/profile', isLoggedIn, async (req, res) => {
   try {
-    const { slug } = req.params;
 
-    // if the slug is null
-    if (!slug) {
-      return res.status(400).json({
-        success: false,
-        err
-      });
-    }
+    const requestedUserID = req.user;
 
-    const user = await User.findOne({ slug });
+    const {
+      first_name,
+      last_name,
+      cedula,
+      address,
+      bio,
+    } = req.body
 
-    // If user doesn't exists
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: 'User not found.'
-      });
-    }
-
-    const requestedUserID = req.user._id + '';
-    const userID = user._id + ''
-
-    // If the user making the request is different from the profile
-    if (requestedUserID !== userID) {
-      return res.status(401).json({
-        success: false,
-        error: 'You doesn\'n have permissions to do this'
-      });
-    }
-
-    const newSpecialities = [...req.body.speciality];
-    console.log('newSpecialities ', newSpecialities);
-
-    const newUser = await User.findOneAndUpdate({ slug }, { ...req.body }, { returnOriginal: false, useFindAndModify: false });
+    const newUser = await User.findOneAndUpdate({ _id: requestedUserID }, {
+      first_name,
+      last_name,
+      cedula,
+      address,
+      bio
+    }, { returnOriginal: false, useFindAndModify: false });
 
     return res.status(200).json({
       success: true,
@@ -123,7 +106,77 @@ router.put('/profile/:slug', isLoggedIn, async (req, res) => {
       error: 'Server Error ' + err
     });
   }
-})
+});
+
+// @desc    Add new Speciality to a logged user
+// @route   POST /api/users/add-new-speciality
+// @access  Private
+router.post('/add-speciality', isLoggedIn, async (req, res) => {
+
+  try {
+    const requestedUserID = req.user;
+
+    const user = await User.findOne({ _id: requestedUserID });
+
+    const { speciality } = req.body
+
+    user.speciality.forEach(element => {
+      const oldSpeciality = element + ''; // Porque tiene que ser un string
+      if (oldSpeciality === speciality) {
+        return res.status(400).json({
+          success: false,
+          error: 'That speciality already exists'
+        });
+      }
+    });
+
+    const newUser = await User.findByIdAndUpdate(user._id,
+      { $push: { speciality: speciality } },
+      { new: true, useFindAndModify: false }
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: newUser
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+});
+
+// @desc    Remove one Speciality to a logged user
+// @route   POST /api/users/remove-new-speciality
+// @access  Private
+router.post('/remove-speciality', isLoggedIn, async (req, res) => {
+
+  try {
+    const requestedUserID = req.user;
+
+    const user = await User.findOne({ _id: requestedUserID });
+
+    const specialityVal = req.body.speciality;
+
+    const newUser = await User.findByIdAndUpdate(user._id,
+      { $pull: { speciality: specialityVal } },
+      { new: true, useFindAndModify: false }
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: newUser
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+});
 
 
 module.exports = router;

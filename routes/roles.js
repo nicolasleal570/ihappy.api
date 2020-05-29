@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
 // @desc    Create new role
 // @route   POST /api/roles/create
 // @access  Public
-router.post('/create', async (req, res) => {
+router.post('/', async (req, res) => {
     try {
 
         const {
