@@ -1,8 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const cloudinary = require('cloudinary');
+const filesystem = require('fs-extra');
 
 const isLoggedIn = require('../utils/verifyProtectedRoutes');
+
+// Cloudinary Config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET
+});
 
 // @desc    List of profiles
 // @route   GET /api/users/
@@ -98,6 +107,30 @@ router.put('/profile', isLoggedIn, async (req, res) => {
     return res.status(200).json({
       success: true,
       data: newUser
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+});
+
+// @desc    Update user image profile
+// @route   PUT /api/users/avatar
+// @access  Private
+router.put('/avatar', isLoggedIn, async (req, res) => {
+  try {
+
+    const { secure_url } = await cloudinary.v2.uploader.upload(req.file.path);
+
+    const user = await User.findByIdAndUpdate(req.user, { avatar: secure_url }, { new: true, useFindAndModify: false });
+    await filesystem.unlink(req.file.path);
+
+    return res.status(200).json({
+      success: false,
+      data: user
     });
 
   } catch (err) {
