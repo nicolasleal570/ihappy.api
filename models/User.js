@@ -7,19 +7,18 @@ mongoose.plugin(slug);
 const UserSchema = mongoose.Schema({
     first_name: {
         type: String,
-        default: ''
     },
     last_name: {
         type: String,
-        default: ''
     },
     cedula: {
         type: Number,
-        default: ''
     },
     address: {
         type: String,
-        default: ''
+    },
+    address: {
+        type: String,
     },
     email: {
         type: String,
@@ -49,9 +48,12 @@ const UserSchema = mongoose.Schema({
     },
     bio: {
         type: String,
-        default: ''
     },
-    speciality: [{ type: Schema.Types.ObjectId, ref: 'Especialidad' }],
+    avatar: {
+        type: String,
+    },
+    rating: Number,
+    speciality: [{ type: Schema.Types.ObjectId, ref: 'Speciality' }],
     tests: [{ type: Schema.Types.ObjectId, ref: 'Test' }],
     created_at: {
         type: Date,
