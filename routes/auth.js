@@ -14,8 +14,16 @@ router.post('/register', async (req, res) => {
             email,
             username,
             password,
+            passwordConfirm,
             role
         } = req.body
+
+        if (password.trim() !== passwordConfirm.trim()) {
+            return res.status(400).json({
+                success: false,
+                error: 'Passwords must match'
+            });
+        }
 
         // Hashing Password
         const salt = await bcrypt.genSalt(10);
@@ -35,12 +43,12 @@ router.post('/register', async (req, res) => {
 
         // Create JWT a token
         const token = createToken(user);
-        // const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
 
         // Send a new token to the client (frontend)
         return res.status(200).json({
             success: true,
-            token
+            token,
+            user
         });
 
     } catch (err) {
@@ -91,7 +99,8 @@ router.post('/login', async (req, res) => {
         // Send a new token to the client (frontend)
         return res.status(200).json({
             success: true,
-            token
+            token,
+            user
         });
 
     } catch (err) {
