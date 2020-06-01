@@ -16,7 +16,7 @@ cloudinary.config({
 // @desc    List of profiles
 // @route   GET /api/users/
 // @access  Public
-router.get('/', async (req, res) => {
+router.get('/', isLoggedIn, async (req, res) => {
   try {
     const users = await User.find();
 

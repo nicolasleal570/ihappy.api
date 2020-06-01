@@ -2,22 +2,26 @@ const jwt = require('jwt-simple');
 const moment = require('moment');
 
 module.exports = function (req, res, next) {
-    if (!req.headers.authorization) {
-        return res
-            .status(403)
-            .send({ message: "Tu petición no tiene cabecera de autorización" });
+    try {
+        if (!req.headers.authorization) {
+            return res
+                .status(403)
+                .send({
+                    success: false,
+                    error: 'You have to be logged in'
+                });
+        }
+
+        const token = req.headers.authorization.split(" ")[1];
+
+        const payload = jwt.decode(token, process.env.TOKEN_SECRET);
+
+        req.user = payload.sub;
+        next();
+    } catch (err) {
+        return res.status(401).send({
+            success: false,
+            error: 'Token expire'
+        });
     }
-
-    const token = req.headers.authorization.split(" ")[1];
-    
-    const payload = jwt.decode(token, process.env.TOKEN_SECRET);
-
-    if (payload.exp <= moment().unix()) {
-        return res
-            .status(401)
-            .send({ message: "El token ha expirado" });
-    }
-
-    req.user = payload.sub;
-    next();
 }
