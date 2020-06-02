@@ -83,7 +83,7 @@ router.post('/login', async (req, res) => {
         // Validate if user exists
         const user = await User.findOne({ email: email });
         if (!user) {
-            return res.status(400).json({ success: false, data: "User doesn't exists" })
+            return res.status(400).json({ success: false, error: "User doesn't exists" })
         }
 
         // Validate password
