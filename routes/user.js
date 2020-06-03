@@ -18,7 +18,7 @@ cloudinary.config({
 // @access  Public
 router.get('/', isLoggedIn, async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().populate('role');
 
     return res.status(200).json({
       success: true,
