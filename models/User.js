@@ -51,6 +51,7 @@ const UserSchema = mongoose.Schema({
     },
     avatar: {
         type: String,
+        default: '/assets/icons/male_avatar.svg'
     },
     rating: Number,
     speciality: [{ type: Schema.Types.ObjectId, ref: 'Speciality' }],
