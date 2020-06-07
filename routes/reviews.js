@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Reviews = require('../models/Reviews');
+const User = require('../models/User');
+const queryStrings = require('querystring');
+const url = require('url');
 
 const isLoggedIn = require('../utils/verifyProtectedRoutes');
 
@@ -32,19 +35,23 @@ router.post('/', isLoggedIn, async (req, res) => {
   try {
     // Destructuring de lo que manda el usuario
     const {
-      id_psicologo,
+      slug_psicologo,
       content,
     } = req.body
 
+    const psicologo = await User.findOne({ slug: slug_psicologo });
+
     const review = await Reviews.create({
-      psicologo: id_psicologo,
+      psicologo: psicologo._id,
       user: req.user,
       content,
     });
 
+    const allReview = await Reviews.findOne(review).populate('user');
+
     return res.status(200).json({
       success: true,
-      data: review
+      data: allReview
     });
 
   } catch (err) {
@@ -68,20 +75,28 @@ router.post('/', isLoggedIn, async (req, res) => {
 // @desc    Filter reviews by psychologist
 // @route   POST /api/reviews/psychologist/
 // @access  Private
-router.post('/psychologist', isLoggedIn, async (req, res) => {
+router.get('/:psychologist', isLoggedIn, async (req, res) => {
   try {
 
-    const { id_psicologo } = req.body;
+    // Psychologist slug
+    const psychologist = req.params.psychologist;
+    const psicologo = await User.findOne({ slug: psychologist });
 
-    if (!id_psicologo) {
+    if (!psychologist) {
       return res.status(400).json({ success: false, error: 'Psychologist ID is required' })
     }
+    if (!psicologo) {
+      return res.status(404).json({ success: false, error: 'Psychologist doesn\'n exists' })
+    }
 
-    const reviews = await Reviews.find({ psicologo: id_psicologo }).populate('user',['-__v', '-password']);
+    const reviews = await Reviews.find({ psicologo: psicologo._id }).populate('user', ['-__v', '-password']);
 
     res.status(200).json({
       success: true,
-      data: reviews
+      data: {
+        reviews,
+        psychologist: psicologo
+      }
     });
 
 
@@ -92,5 +107,10 @@ router.post('/psychologist', isLoggedIn, async (req, res) => {
     });
   }
 })
+
+router.post('/img', (req, res) => {
+  console.log(req.file);
+  res.send('hola');
+});
 
 module.exports = router;

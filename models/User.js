@@ -17,9 +17,6 @@ const UserSchema = mongoose.Schema({
     address: {
         type: String,
     },
-    address: {
-        type: String,
-    },
     email: {
         type: String,
         required: true,
@@ -43,7 +40,7 @@ const UserSchema = mongoose.Schema({
     slug: { type: String, slug: ["first_name", "last_name", "username"] },
     role: {
         type: Schema.Types.ObjectId,
-        ref: 'Role',
+        ref: 'Roles',
         required: true
     },
     bio: {
