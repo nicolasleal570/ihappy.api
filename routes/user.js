@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const Role = require('../models/Role');
 const cloudinary = require('cloudinary');
 const filesystem = require('fs-extra');
 
@@ -42,6 +43,40 @@ router.get('/', isLoggedIn, async (req, res) => {
   }
 
 });
+
+router.get('/doctors', isLoggedIn, async (req, res) => {
+  try {
+    const { limit } = req.query;
+
+    const role = await Role.findOne({ identification: 'psicologo' });
+
+    if (!role) {
+      res.status(400).json({
+        success: false,
+        data: 'Role doesn\'t exists'
+      });
+    }
+
+    let doctors = [];
+    if (limit) {
+      doctors = await User.find({ role }).limit(Number(limit));
+    } else {
+      doctors = await User.find({ role });
+    }
+
+
+    res.status(200).json({
+      success: true,
+      data: doctors
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+})
 
 // @desc    Look an user profile
 // @route   GET /api/users/profile/:slug
