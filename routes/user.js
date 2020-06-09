@@ -42,7 +42,34 @@ router.get('/', isLoggedIn, async (req, res) => {
   }
 
 });
+router.get('/specialities/: slug', isLoggedIn, async (req, res) => {
+  try {
+    const {slug} = req.params;
 
+    const speciality = await speciality.findOne({
+      slug
+    });
+    const users = await User.find({ speciality });
+    
+    if (!slug) {
+      returnres.status(400).json({
+        success: false,
+        error:'The slug was not provide'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: users
+    });
+    
+  } catch(err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error' + err
+    });
+  }
+});
 // @desc    Look an user profile
 // @route   GET /api/users/profile/:slug
 // @access  Public
