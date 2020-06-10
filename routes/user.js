@@ -43,7 +43,7 @@ router.get('/', isLoggedIn, async (req, res) => {
   }
 
 });
-router.get('/specialities/: slug', isLoggedIn, async (req, res) => {
+router.get('/specialities/:slug', isLoggedIn, async (req, res) => {
   try {
     const { slug } = req.params;
 
