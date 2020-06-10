@@ -7,8 +7,11 @@ const morgan = require('morgan');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
-const connectDB = require('./config/db');
+const nodemailer = require('nodemailer');
+const creds = require('./config');
 
+
+const connectDB = require('./config/db');
 dotenv.config({ path: './config/config.env' });
 
 // Connect DB
@@ -27,11 +30,17 @@ const testRoute = require('./routes/test');
 const userRoute = require('./routes/user');
 const authRoute = require('./routes/auth');
 const roleRoute = require('./routes/roles');
+const emailRoute = require('./routes/emails')
+
 
 //Middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
+
+app.use(express.json()); 
+
+
 
 // Uploads user avatars
 const storage = multer.diskStorage({
@@ -59,6 +68,7 @@ app.use('/api/reviews', reviewsRoute);
 app.use('/api/specialities', specialtyRoute);
 app.use('/api/test', testRoute);
 app.use('/api/roles', roleRoute);
+app.use('/api/emails',emailRoute)
 
 // Port
 const PORT = process.env.PORT || 3000;
