@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Role = require('../models/Role');
+const Speciality = require('../models/Specialty');
 const cloudinary = require('cloudinary');
 const filesystem = require('fs-extra');
 
@@ -43,21 +44,33 @@ router.get('/', isLoggedIn, async (req, res) => {
   }
 
 });
-router.get('/specialities/:slug', isLoggedIn, async (req, res) => {
+
+// Get doctors by speciality
+router.get('/specialities/', isLoggedIn, async (req, res) => {
   try {
-    const { slug } = req.params;
+    const { name } = req.query;
 
-    const speciality = await speciality.findOne({
-      slug
-    });
-    const users = await User.find({ speciality });
-
-    if (!slug) {
-      returnres.status(400).json({
+    if (!name) {
+      return res.status(400).json({
         success: false,
-        error: 'The slug was not provide'
+        error: 'The name was not provide'
       });
     }
+
+    const speciality = await Speciality.findOne({
+      name
+    });
+
+    const role = await Role.findOne({ identification: 'psicologo' });
+
+    if (!speciality) {
+      return res.status(400).json({
+        success: false,
+        error: 'That speciality does\'t exists'
+      });
+    }
+
+    const users = await User.find({ speciality, role }).populate('role').populate('speciality');
 
     res.json({
       success: true,
@@ -87,9 +100,9 @@ router.get('/doctors', isLoggedIn, async (req, res) => {
 
     let doctors = [];
     if (limit) {
-      doctors = await User.find({ role }).limit(Number(limit));
+      doctors = await User.find({ role }).limit(Number(limit)).populate('role').populate('speciality');
     } else {
-      doctors = await User.find({ role });
+      doctors = await User.find({ role }).populate('role').populate('speciality');
     }
 
 
