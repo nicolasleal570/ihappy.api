@@ -32,7 +32,11 @@ router.get('/', async (req, res) => {
 //enviar correos
 
 var transport = {
-    host: 'smtp.gmail.com', // e.g. smtp.gmail.com
+    host: 'smtp.gmail.com',
+    secureConnection: false,
+    port: 587,
+    requiresAuth: true,
+    domains: ["gmail.com", "googlemail.com"], // e.g. smtp.gmail.com
     auth: {
       user: creds.USER,
       pass: creds.PASS
@@ -45,7 +49,7 @@ var transport = {
     if (error) {
       console.log(error);
     } else {
-      console.log('All works fine, congratz!');
+      console.log('Transporter is working!');
     }
   });
 
@@ -58,12 +62,32 @@ router.post('/', (req, res, next) => {
       from: name,
       to: email,  
       subject: `iHappy`,
-      html:`${name}, hemos recibido su solicitud, le responderemos en la mayor brevedad posible`
+      html:`<h2>${name}, gracias por contacatar a iHappy</h2><p>Nuestro equipo de soporte lo atenderá lo mas rapido posible</p>
+      <hr></hr> 
+      <img src="https://res.cloudinary.com/delbvxq6t/image/upload/v1592084209/logo_mmwg0k.png" width="80" height="80"></img>
+      <p>Gracias por elegirnos!</p>`
     }
-
-    
-  
+    var reply = {
+      from: name,
+      to: 'TheRealiHappy@gmail.com',  
+      subject: `Support Request - iHappy`,
+      html:`Enviaron un correo desde su pagina web
+      <p>Nombre:${name}</p> 
+      <p>Correo:${email}</p>
+      <p>Mensaje:${message}</p>`
+    }
     transporter.sendMail(mail, (err, data) => {
+      if (err) {
+        res.json({
+          msg: 'fail'
+        })
+      } else {
+        res.json({
+          msg: 'success'
+        })
+      }
+    })
+    transporter.sendMail(reply, (err, data) => {
       if (err) {
         res.json({
           msg: 'fail'
