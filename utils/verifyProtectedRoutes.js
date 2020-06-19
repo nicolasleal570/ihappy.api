@@ -1,5 +1,5 @@
 const jwt = require('jwt-simple');
-const moment = require('moment');
+const cookieParser = require('cookie-parser')
 
 module.exports = function (req, res, next) {
     try {
