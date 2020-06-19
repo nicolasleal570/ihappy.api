@@ -1,49 +1,60 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Conversations = require('../models/Conversations');
+const Conversation = require("../models/Conversation");
+const User = require("../models/User");
+const isLoggedIn = require("../utils/verifyProtectedRoutes");
 
-router.get('/', function (req, res) {
-  res.send('Hello Conversations');
-});
-
-router.post('/', async (req, res) => {
-
+// Get conversations filtering by the logged user
+router.get("/", isLoggedIn, async (req, res) => {
   try {
-    // Destructuring de lo que manda el usuario
-    const {
-        id_psicologo,
-        id_usuario,
-        last_message,
-        last_time
-    } = req.body
+    const user = await User.findById(req.user);
+    const conversations = await Conversation.find({participants: user._id}).populate('participants')
 
-    const conversations = await Conversations.create({
-        id_psicologo,
-        id_usuario,
-        last_message,
-        last_time
-    });
-
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
-      data: conversations
+      data: conversations,
     });
-
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      const messages = Object.values(err.errors).map(val => val.message);
+    if (err.name === "ValidationError") {
+      const messages = Object.values(err.errors).map((val) => val.message);
 
       return res.status(400).json({
         success: false,
-        error: messages
+        error: messages,
       });
     } else {
       return res.status(500).json({
         success: false,
-        error: 'Server Error'
+        error: "Server Error " + err,
       });
     }
   }
-
 });
+
+// Create a conversation
+router.post("/", isLoggedIn, async (req, res) => {
+  try {
+    const { participants, last_message, last_time } = req.body;
+
+  const conversation = await Conversation.create({
+    participants: [req.user, ...participants],
+    last_message,
+    last_time,
+  });
+
+  global.io.sockets.join(conversation._id);
+
+  res.status(200).json({
+    success: true,
+    data: conversation
+  });
+
+  } catch (err) {
+    res.status(500).json({
+      success: true,
+      error: err
+    });    
+  }
+});
+
 module.exports = router;
