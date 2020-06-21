@@ -34,12 +34,13 @@ router.get("/", isLoggedIn, async (req, res) => {
 // Create a conversation
 router.post("/", isLoggedIn, async (req, res) => {
   try {
-    const { participants, last_message, last_time } = req.body;
+    const { participants, last_message, last_time, pendiente } = req.body;
 
   const conversation = await Conversation.create({
     participants: [req.user, ...participants],
     last_message,
     last_time,
+    pendiente
   });
 
   global.io.sockets.join(conversation._id);
@@ -54,6 +55,37 @@ router.post("/", isLoggedIn, async (req, res) => {
       success: true,
       error: err
     });    
+  }
+});
+
+
+// @desc    Modify profile of logged user
+// @route   PUT /api/conversations/conversation
+// @access  Private
+router.put('/', isLoggedIn, async (req, res) => {
+  console.log('hola')
+  try {  
+    console.log('chao')
+    const { conversation } = req.query;
+    const{
+      pendiente
+    }=req.body
+    console.log(conversation)
+    const newConversation = await Conversation.findOneAndUpdate({ _id: conversation }, {
+      
+      pendiente
+    }, { returnOriginal: false, useFindAndModify: false });
+
+    return res.status(200).json({
+      success: true,
+      data: newConversation
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
   }
 });
 

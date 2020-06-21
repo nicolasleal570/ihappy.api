@@ -81,7 +81,7 @@ router.post('/login', async (req, res) => {
         } = req.body
 
         // Validate if user exists
-        const user = await User.findOne({ email: email });
+        const user = await User.findOne({ email: email }).populate('role');
         if (!user) {
             return res.status(400).json({ success: false, error: "User doesn't exists" })
         }
