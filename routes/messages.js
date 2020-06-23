@@ -77,10 +77,10 @@ router.post("/", isLoggedIn, async (req, res) => {
       },
       { last_message: content, last_time: Date.now() },
       { returnOriginal: false, useFindAndModify: false }
-    );
-    
+    ).populate('participants');
+
     // sending to all clients in 'conver._id' room, including sender
-    global.io.sockets.in(conver._id).emit('new message', { message });
+    global.io.sockets.in(conver._id).emit('new message', { message, conversation: conver });
 
     return res.status(200).json({
       success: true,
