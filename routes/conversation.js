@@ -68,12 +68,13 @@ router.put('/', isLoggedIn, async (req, res) => {
     console.log('chao')
     const { conversation } = req.query;
     const{
-      pendiente
+      pendiente,
+      hidden
     }=req.body
     console.log(conversation)
     const newConversation = await Conversation.findOneAndUpdate({ _id: conversation }, {
       
-      pendiente
+      pendiente,hidden
     }, { returnOriginal: false, useFindAndModify: false });
 
     return res.status(200).json({
