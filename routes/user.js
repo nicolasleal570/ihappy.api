@@ -177,7 +177,7 @@ router.put('/profile', isLoggedIn, async (req, res) => {
       last_name,
       cedula,
       address,
-      bio
+      bio,
     }, { returnOriginal: false, useFindAndModify: false });
 
     return res.status(200).json({

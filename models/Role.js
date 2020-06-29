@@ -8,7 +8,7 @@ const RoleSchema = mongoose.Schema({
     identification: {
         type: String,
         required: true,
-        enum: ['psicologo', 'usuario']
+        enum: ['psicologo', 'usuario', 'admin']
     },
 })
 

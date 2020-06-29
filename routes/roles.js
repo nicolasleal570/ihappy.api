@@ -8,7 +8,7 @@ const Role = require('../models/Role');
 router.get('/', async (req, res) => {
     try {
 
-        const roles = await Role.find();
+        const roles = await Role.find({identification: { $ne: 'admin'}});
 
         return res.status(200).json({
             success: true,
