@@ -34,12 +34,16 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ success: false, data: "Email already exists" })
         }
 
-        const user = await User.create({
+        let user = await User.create({
             email,
             username,
             password: hashPassword,
             role
         });
+
+        user = await User.findById(user._id).populate('role');
+
+        console.log(user);
 
         // Create JWT a token
         const token = createToken(user);
