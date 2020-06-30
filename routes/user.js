@@ -85,6 +85,42 @@ router.get('/specialities/', isLoggedIn, async (req, res) => {
   }
 });
 
+// Get pacients
+router.get('/pacients', isLoggedIn, async (req, res) => {
+  try {
+    const { limit } = req.query;
+
+    const role = await Role.findOne({ identification: 'usuario' });
+
+    if (!role) {
+      res.status(400).json({
+        success: false,
+        data: 'Role doesn\'t exists'
+      });
+    }
+
+    let doctors = [];
+    if (limit) {
+      doctors = await User.find({ role }).limit(Number(limit)).populate('role').populate('speciality');
+    } else {
+      doctors = await User.find({ role }).populate('role').populate('speciality');
+    }
+
+
+    res.status(200).json({
+      success: true,
+      data: doctors
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+})
+
+// Get doctors
 router.get('/doctors', isLoggedIn, async (req, res) => {
   try {
     const { limit } = req.query;
@@ -178,6 +214,52 @@ router.put('/profile', isLoggedIn, async (req, res) => {
       cedula,
       address,
       bio,
+    }, { returnOriginal: false, useFindAndModify: false });
+
+    return res.status(200).json({
+      success: true,
+      data: newUser
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+});
+
+// @desc Disable an user
+// @route PUT /api/users/disable
+// @access Private
+router.put('/disable/:slug', isLoggedIn, async (req, res) => {
+  try {
+
+    const {slug}  = req.params;
+
+    if (!slug) {
+      return res.status(400).json({
+        success: false,
+        error: 'The slug was not provide'
+      });
+    }
+
+    const user = await User.findOne({ slug });
+
+    let habilitado = false;
+    if(user.disabled==null){
+      habilitado = true;
+    }
+    if(user.disabled == true){
+      habilitado = false;
+    }
+    if(user.disabled == false){
+      habilitado = true;
+    }
+    const disabled = await habilitado
+
+    const newUser = await User.findOneAndUpdate({ _id: user._id }, {
+      disabled  
     }, { returnOriginal: false, useFindAndModify: false });
 
     return res.status(200).json({
