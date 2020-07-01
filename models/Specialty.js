@@ -10,5 +10,4 @@ const SpecialitySchema = mongoose.Schema({
     },
     slug: { type: String, slug: "name" }
 })
-
 module.exports = mongoose.model('Speciality', SpecialitySchema)

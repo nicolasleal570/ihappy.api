@@ -155,6 +155,52 @@ router.get('/doctors', isLoggedIn, async (req, res) => {
   }
 })
 
+// Get count of doctors by specialityes
+router.get('/specialities/count', isLoggedIn, async (req, res) => {
+  try {
+    
+
+    const aggregatorOpts = [{
+      "$unwind": "$speciality"
+    },{
+
+      $lookup:{
+        from: "specialities",       // other table name
+        localField: "speciality",   // name of users table field
+        foreignField: "_id", // name of userinfo table field
+        as: "na"         // alias for userinfo table
+    }
+    }
+    
+    , {
+      "$group": {
+        "_id": "$na.name",
+        "count": {
+          "$sum": 1
+        }
+      }
+    }, {
+      "$sort": {
+        "_id": 1
+      }
+    }, ]
+
+
+    const users = await User.aggregate(aggregatorOpts).exec();
+
+    res.json({
+      success: true,
+      data: users
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error' + err
+    });
+  }
+});
+
 // @desc    Look an user profile
 // @route   GET /api/users/profile/:slug
 // @access  Public
@@ -368,6 +414,8 @@ router.post('/remove-speciality', isLoggedIn, async (req, res) => {
     });
   }
 });
+
+
 
 
 module.exports = router;
