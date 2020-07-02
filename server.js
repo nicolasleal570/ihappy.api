@@ -6,7 +6,7 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const http = require("http");
-const WebSockets = require('./utils/WebSockets');
+const cookieParser = require('cookie-parser')
 
 const app = express();
 const server = http.createServer(app);
@@ -42,9 +42,11 @@ const emailRoute = require("./routes/emails");
 //Middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors());
-
-app.use(express.json());
+app.use(cors({
+  credentials: true,
+  origin: process.env.CLIENT_URL
+}));
+app.use(cookieParser())
 
 // Uploads user avatars
 const storage = multer.diskStorage({
