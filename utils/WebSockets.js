@@ -1,8 +1,6 @@
 let users = [];
 
 module.exports = function (client) {
-  console.log("New client", client.id);
-
   client.on("identity", (userId) => {
     if (userId) {
       const existUser = users.find((user) => user.userId === userId);
@@ -11,9 +9,9 @@ module.exports = function (client) {
           socketId: client.id,
           userId: userId,
         });
-      }else {
-        const newUsers = users.filter(user => user.userId !== userId);
-        existUser.socketId = client.id
+      } else {
+        const newUsers = users.filter((user) => user.userId !== userId);
+        existUser.socketId = client.id;
         newUsers.push(existUser);
       }
     }
