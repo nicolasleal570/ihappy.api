@@ -61,6 +61,9 @@ const UserSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
+    precioConsulta : {
+        type: Number
+    }
 })
 
 module.exports = mongoose.model('User', UserSchema)

@@ -252,6 +252,7 @@ router.put('/profile', isLoggedIn, async (req, res) => {
       cedula,
       address,
       bio,
+      precioConsulta
     } = req.body
 
     const newUser = await User.findOneAndUpdate({ _id: requestedUserID }, {
@@ -260,6 +261,7 @@ router.put('/profile', isLoggedIn, async (req, res) => {
       cedula,
       address,
       bio,
+      precioConsulta
     }, { returnOriginal: false, useFindAndModify: false });
 
     return res.status(200).json({
