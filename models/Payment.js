@@ -4,7 +4,9 @@ const Schema = mongoose.Schema;
 const PaymentSchema = mongoose.Schema({
 
     amount:Number,
-    id: String
+    stripeID: String,
+    idUsuario: String,
+    idPsicologo: String
 
 });
 

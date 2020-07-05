@@ -37,7 +37,7 @@ const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
 const roleRoute = require("./routes/roles");
 const emailRoute = require("./routes/emails");
-const paymentRoute = require("./routes/payment");
+// const paymentRoute = require("./routes/payment");
 
 //Middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -77,7 +77,7 @@ app.use("/api/specialities", specialtyRoute);
 app.use("/api/test", testRoute);
 app.use("/api/roles", roleRoute);
 app.use("/api/emails", emailRoute);
-app.use("/api/payment",paymentRoute);
+// app.use("/api/payment",paymentRoute);
 // Port
 const PORT = process.env.PORT || 3000;
 

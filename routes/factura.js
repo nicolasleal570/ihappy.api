@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Factura = require('../models/Factura');
 const User = require('../models/User');
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 const queryStrings = require('querystring');
 const url = require('url');
 
@@ -24,6 +25,41 @@ router.get('/', isLoggedIn, async (req, res) => {
     });
   }
 });
+
+//Metodo post para Stripe
+router.post('/', isLoggedIn, async (req, res) => {
+  const { id, amount, slug_psicologo} = req.body;
+  // const user = await User.findById(req.user);
+  const psicologo = await User.findOne({ slug: slug_psicologo });
+  
+  try {
+    const payment = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: 'USD',
+      payment_method: id,
+      description: `Pago a psicologo: ${psicologo._id}, un total de ${amount/100}`,
+      confirm: true
+    });
+    const factura = await Factura.create({
+      payment_id: payment.id,
+      total:amount/100,
+      psicologo:psicologo._id,
+      user: req.user
+    });
+    const Allfactura = await Factura.findOne(factura).populate('user');
+    console.log(payment)
+    console.log(payment.id)
+    console.log(factura)
+    return res.status(200).json({
+      confirm: 'Compra realizada.',
+      confirm: 'Factura creada'
+    })
+  } catch (error) {
+    return res.status(400).json({
+      error: error.message
+    })
+  }
+})
 
 // router.post('/', async (req, res) => {
 
