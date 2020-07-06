@@ -5,7 +5,7 @@ const User = require("../models/User");
 const createToken = require("../utils/services");
 const { initSession } = require("../utils/utils");
 
-const isLoggedIn = require('../utils/verifyProtectedRoutes');
+const isLoggedIn = require("../utils/verifyProtectedRoutes");
 
 // @desc    Register new user
 // @route   POST /api/auth/register/
@@ -61,10 +61,10 @@ router.post("/register", async (req, res) => {
     // Send a new token to the client (frontend)
     return res
       .cookie("token", session.token, {
-        httpOnly: true,
-        sameSite: true,
+        httpOnly: false,
+        sameSite: "lax",
         maxAge: 1209600000,
-        secure: false,
+        secure: process.env.NODE_ENV === "production" ? true : false,
       })
       .status(200)
       .json({
@@ -120,10 +120,10 @@ router.post("/login", async (req, res) => {
     // Send a new token to the client (frontend)
     return res
       .cookie("token", session.token, {
-        httpOnly: true,
-        sameSite: true,
+        httpOnly: false,
+        sameSite: "lax",
         maxAge: 1209600000,
-        secure: false,
+        secure: process.env.NODE_ENV === "production" ? true : false,
       })
       .status(200)
       .json({
@@ -157,9 +157,9 @@ router.get("/me", isLoggedIn, async (req, res) => {
     const user = await User.findById(requestedUserID).populate("role");
 
     res.status(200).json({
-        success: true,
-        data: user
-      });
+      success: true,
+      data: user,
+    });
   } catch (err) {
     return res.status(401).json({
       success: false,
@@ -172,22 +172,21 @@ router.get("/me", isLoggedIn, async (req, res) => {
 // @route   PUT /api/auth/logout/
 // @access  Private
 router.put("/logout", isLoggedIn, async (req, res) => {
-    try {
-        const { session } = req;
-        await session.expireToken(session.token);
-        res.clearCookie('token');
+  try {
+    const { session } = req;
+    await session.expireToken(session.token);
+    res.clearCookie("token");
 
-        return res.status(200).json({
-            success: true,
-            data: 'Successfuly expired login session'
-        });
-
-    } catch (err) {
-        return res.status(500).json({
-            success: false,
-            error: 'Something went wrong during the logout process.'
-        })
-    }
+    return res.status(200).json({
+      success: true,
+      data: "Successfuly expired login session",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: "Something went wrong during the logout process.",
+    });
+  }
 });
 
 module.exports = router;
