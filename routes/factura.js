@@ -111,7 +111,7 @@ router.post('/', isLoggedIn, async (req, res) => {
 // @desc    Filter reviews by psychologist
 // @route   POST /api/reviews/psychologist/
 // @access  Private
-router.get('/:psychologist', isLoggedIn, async (req, res) => {
+router.get('/find/:psychologist', isLoggedIn, async (req, res) => {
 
   try {
 
@@ -126,13 +126,12 @@ router.get('/:psychologist', isLoggedIn, async (req, res) => {
       return res.status(404).json({ success: false, error: 'Psychologist doesn\'n exists' })
     }
 
-    const factura = await Factura.find({ psicologo: psicologo._id }).populate('user', ['-__v', '-password']);
+    const factura = await Factura.find({ psicologo: psicologo._id }).populate('user');
 
     res.status(200).json({
       success: true,
       data: {
-        factura,
-        psychologist: psicologo
+        factura
       }
     });
 
@@ -144,6 +143,28 @@ router.get('/:psychologist', isLoggedIn, async (req, res) => {
     });
   }
 })
+
+// Get id and total of Ganancias
+router.get('/stats/finance', isLoggedIn, async (req, res) => {
+  try {
+
+    
+
+    const factura = await Factura.find().populate('user').populate('psicologo');
+
+    return res.status(200).json({
+      success: true,
+      data: factura
+    })
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+});
+
 
 
 module.exports = router;
