@@ -154,7 +154,7 @@ router.post("/login", async (req, res) => {
 router.get("/me", isLoggedIn, async (req, res) => {
   try {
     const requestedUserID = req.user;
-    const user = await User.findById(requestedUserID).populate("role");
+    const user = await (await User.findById(requestedUserID).populate("role").populate('speciality'));
 
     res.status(200).json({
         success: true,
