@@ -150,7 +150,7 @@ router.get('/stats/finance', isLoggedIn, async (req, res) => {
 
     
 
-    const factura = await Factura.find({}, {total:1, _id:1});
+    const factura = await Factura.find().populate('user').populate('psicologo');
 
     return res.status(200).json({
       success: true,
