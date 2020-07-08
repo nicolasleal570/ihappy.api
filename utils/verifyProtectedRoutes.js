@@ -1,5 +1,4 @@
 const jwt = require("jwt-simple");
-const cookieParser = require("cookie-parser");
 
 module.exports = function (req, res, next) {
   try {
