@@ -6,7 +6,6 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const http = require("http");
-const cookieParser = require('cookie-parser')
 const app = express();
 const server = http.createServer(app);
 
@@ -45,8 +44,6 @@ app.use(cors({
   credentials: true,
   origin: [process.env.CLIENT_URL]
 }));
-
-app.use(cookieParser())
 
 // Uploads user avatars
 const storage = multer.diskStorage({
