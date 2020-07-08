@@ -9,7 +9,7 @@ const FacturaSchema = mongoose.Schema({
     default: Date.now
     },
     total: Number,
-    id_tarjeta: {type: Schema.Types.ObjectId, ref: 'Bank_accounts'}
+    payment_id: String
 });
 
 module.exports = mongoose.model('Factura', FacturaSchema)
