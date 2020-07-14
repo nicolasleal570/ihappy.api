@@ -155,6 +155,38 @@ router.get('/doctors', isLoggedIn, async (req, res) => {
   }
 })
 
+// Get doctors home --Only 4 whitout the need of been login--
+router.get('/home/doctors', async (req, res) => {
+  try {
+    
+
+    const role = await Role.findOne({ identification: 'psicologo' });
+
+    if (!role) {
+      res.status(400).json({
+        success: false,
+        data: 'Role doesn\'t exists'
+      });
+    }
+
+    let doctors = [];
+      doctors = await User.find({ role }).limit(Number(4)).populate('role').populate('speciality');
+    
+
+
+    res.status(200).json({
+      success: true,
+      data: doctors
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+})
+
 // Get count of doctors by specialityes
 router.get('/specialities/count', isLoggedIn, async (req, res) => {
   try {
