@@ -9,7 +9,15 @@ const FacturaSchema = mongoose.Schema({
     default: Date.now
     },
     total: Number,
-    payment_id: String
+    payment_id: String,
+    requestToPay: {
+        type: Boolean,
+        default:false
+    },
+    paid: {
+        type: Boolean,
+        default:false
+    }
 });
 
 module.exports = mongoose.model('Factura', FacturaSchema)

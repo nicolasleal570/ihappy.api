@@ -98,7 +98,41 @@ router.post("/", async (req, res) => {
     }
   }
 });
+// router.put("/:psychologist", isLoggedIn, async(req,res) => {
+//   try{
+//     const psychologist = req.params.psychologist;
+//     const psicologo = await User.findOne({slug: psychologist})
 
+//   }
+// })
+router.put('/:psychologist', isLoggedIn, async (req, res) => {
+  try {
+
+    const requestedUserID = req.user;
+
+    const {
+      requestToPay,
+      paid,
+      psicoID
+    } = req.body
+    console.log(requestedUserID)
+    const newBill = await Factura.updateMany({ psicologo: requestedUserID , psicologo: psicoID }, {
+      requestToPay,
+      paid
+    }, { returnOriginal: false, useFindAndModify: false });
+
+    return res.status(200).json({
+      success: true,
+      data: newBill
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+});
 // @desc    Filter reviews by psychologist
 // @route   POST /api/reviews/psychologist/
 // @access  Private
