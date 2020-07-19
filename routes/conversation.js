@@ -1,21 +1,26 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const Conversation = require("../models/Conversation");
-const User = require("../models/User");
-const isLoggedIn = require("../utils/verifyProtectedRoutes");
+const Conversation = require('../models/Conversation');
+const User = require('../models/User');
+const isLoggedIn = require('../utils/verifyProtectedRoutes');
 
 // Get conversations filtering by the logged user
-router.get("/", isLoggedIn, async (req, res) => {
+router.get('/', isLoggedIn, async (req, res) => {
   try {
     const user = await User.findById(req.user);
-    const conversations = await Conversation.find({participants: user._id}).populate('participants')
+    const conversations = await Conversation.find({
+      participants: user._id,
+    })
+      .lean()
+      .populate('participants')
+      .sort([['last_time', -1]]);
 
     res.status(200).json({
       success: true,
       data: conversations,
     });
   } catch (err) {
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map((val) => val.message);
 
       return res.status(400).json({
@@ -25,67 +30,62 @@ router.get("/", isLoggedIn, async (req, res) => {
     } else {
       return res.status(500).json({
         success: false,
-        error: "Server Error " + err,
+        error: 'Server Error ' + err,
       });
     }
   }
 });
 
 // Create a conversation
-router.post("/", isLoggedIn, async (req, res) => {
+router.post('/', isLoggedIn, async (req, res) => {
   try {
     const { participants, last_message, last_time, pendiente } = req.body;
 
-  const conversation = await Conversation.create({
-    participants: [req.user, ...participants],
-    last_message,
-    last_time,
-    pendiente
-  });
+    const conversation = await Conversation.create({
+      participants: [req.user, ...participants],
+      last_message,
+      last_time,
+      pendiente,
+    });
 
-  global.io.sockets.join(conversation._id);
+    global.io.sockets.join(conversation._id);
 
-  res.status(200).json({
-    success: true,
-    data: conversation
-  });
-
+    res.status(200).json({
+      success: true,
+      data: conversation,
+    });
   } catch (err) {
     res.status(500).json({
       success: true,
-      error: err
-    });    
+      error: err,
+    });
   }
 });
-
 
 // @desc    Modify profile of logged user
 // @route   PUT /api/conversations/conversation
 // @access  Private
 router.put('/', isLoggedIn, async (req, res) => {
-  console.log('hola')
-  try {  
-    console.log('chao')
+  try {
     const { conversation } = req.query;
-    const{
-      pendiente,
-      hidden
-    }=req.body
-    console.log(conversation)
-    const newConversation = await Conversation.findOneAndUpdate({ _id: conversation }, {
-      
-      pendiente,hidden
-    }, { returnOriginal: false, useFindAndModify: false });
+    const { pendiente, hidden } = req.body;
+    const newConversation = await Conversation.findOneAndUpdate(
+      { _id: conversation },
+      {
+        pendiente,
+        hidden,
+      },
+      { returnOriginal: false, useFindAndModify: false }
+    );
 
     return res.status(200).json({
       success: true,
-      data: newConversation
+      data: newConversation,
     });
-
   } catch (err) {
     return res.status(500).json({
       success: false,
-      error: 'Server Error ' + err
+      error: 'Server Error ' + err,
     });
   }
 });

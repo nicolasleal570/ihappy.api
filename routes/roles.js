@@ -6,61 +6,52 @@ const Role = require('../models/Role');
 // @route   GET /api/roles/
 // @access  Public
 router.get('/', async (req, res) => {
-    try {
+  try {
+    const roles = await Role.find({ identification: { $ne: 'admin' } }).lean();
 
-        const roles = await Role.find({identification: { $ne: 'admin'}});
-
-        return res.status(200).json({
-            success: true,
-            data: roles
-        });
-
-    } catch (err) {
-        return res.status(500).json({
-            success: false,
-            error: 'Server Error'
-        });
-    }
-
+    return res.status(200).json({
+      success: true,
+      data: roles,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error',
+    });
+  }
 });
 
 // @desc    Create new role
 // @route   POST /api/roles/
 // @access  Public
 router.post('/', async (req, res) => {
-    try {
+  try {
+    const { public_name, identification } = req.body;
 
-        const {
-            public_name,
-            identification
-        } = req.body
+    const role = await Role.create({
+      public_name,
+      identification,
+    });
 
-        const role = await Role.create({
-            public_name,
-            identification
-        });
+    return res.status(200).json({
+      success: true,
+      data: role,
+    });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map((val) => val.message);
 
-        return res.status(200).json({
-            success: true,
-            data: role
-        });
-
-    } catch (err) {
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(val => val.message);
-
-            return res.status(400).json({
-                success: false,
-                error: messages
-            });
-        } else {
-            return res.status(500).json({
-                success: false,
-                error: 'Server Error'
-            });
-        }
+      return res.status(400).json({
+        success: false,
+        error: messages,
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        error: 'Server Error',
+      });
     }
-
+  }
 });
 
 module.exports = router;
