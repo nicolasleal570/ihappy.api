@@ -81,7 +81,7 @@ router.post('/', isLoggedIn, async (req, res) => {
 
     // sending to all clients in 'conver._id' room, including sender
     global.io.sockets
-      .in(conver._id)
+      .to(conver._id)
       .emit('new message', { message, conversation: conver });
 
     return res.status(200).json({

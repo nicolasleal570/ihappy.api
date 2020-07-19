@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 const User = require('../models/User');
 const createToken = require('../utils/services');
+const isLoggedIn = require('../utils/verifyProtectedRoutes');
 
 // @desc    Register new user
 // @route   POST /api/auth/register/
