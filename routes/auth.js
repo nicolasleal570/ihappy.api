@@ -1,13 +1,14 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
+const express = require('express');
+const bcrypt = require('bcryptjs');
 const router = express.Router();
-const User = require("../models/User");
-const createToken = require("../utils/services");
+const User = require('../models/User');
+const createToken = require('../utils/services');
+const isLoggedIn = require('../utils/verifyProtectedRoutes');
 
 // @desc    Register new user
 // @route   POST /api/auth/register/
 // @access  Public
-router.post("/register", async (req, res) => {
+router.post('/register', async (req, res) => {
   try {
     // Destructuring de lo que manda el usuario
     const { email, username, password, passwordConfirm, role } = req.body;
@@ -15,7 +16,7 @@ router.post("/register", async (req, res) => {
     if (password.trim() !== passwordConfirm.trim()) {
       return res.status(400).json({
         success: false,
-        error: "Passwords must match",
+        error: 'Passwords must match',
       });
     }
 
@@ -27,7 +28,7 @@ router.post("/register", async (req, res) => {
     if (emailExist) {
       return res
         .status(400)
-        .json({ success: false, data: "Email already exists" });
+        .json({ success: false, data: 'Email already exists' });
     }
 
     let user = await User.create({
@@ -37,9 +38,7 @@ router.post("/register", async (req, res) => {
       role,
     });
 
-    user = await User.findById(user._id).populate("role");
-
-    console.log(user);
+    user = await User.findById(user._id).populate('role');
 
     // Create JWT a token
     const token = createToken(user);
@@ -51,7 +50,7 @@ router.post("/register", async (req, res) => {
       user,
     });
   } catch (err) {
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map((val) => val.message);
 
       return res.status(400).json({
@@ -61,7 +60,7 @@ router.post("/register", async (req, res) => {
     } else {
       return res.status(500).json({
         success: false,
-        error: "Server Error " + err,
+        error: 'Server Error ' + err,
       });
     }
   }
@@ -70,12 +69,14 @@ router.post("/register", async (req, res) => {
 // @desc    Register new user
 // @route   POST /api/users/login/
 // @access  Public
-router.post("/login", async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
     // Validate if user exists
-    const user = await User.findOne({ email: email}).populate("role").populate('speciality');
+    const user = await User.findOne({ email: email })
+      .populate('role')
+      .populate('speciality');
     if (!user) {
       return res
         .status(400)
@@ -92,7 +93,7 @@ router.post("/login", async (req, res) => {
     if (!validPassword) {
       return res
         .status(400)
-        .json({ success: false, error: "Invalid password" });
+        .json({ success: false, error: 'Invalid password' });
     }
 
     // Create JWT a token
@@ -106,7 +107,7 @@ router.post("/login", async (req, res) => {
       user,
     });
   } catch (err) {
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map((val) => val.message);
 
       return res.status(400).json({
@@ -116,7 +117,7 @@ router.post("/login", async (req, res) => {
     } else {
       return res.status(500).json({
         success: false,
-        error: "Server Error " + err,
+        error: 'Server Error ' + err,
       });
     }
   }
