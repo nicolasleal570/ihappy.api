@@ -75,12 +75,17 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     // Validate if user exists
-    const user = await User.findOne({ email: email }).populate("role").populate('speciality');
+    const user = await User.findOne({ email: email}).populate("role").populate('speciality');
     if (!user) {
       return res
         .status(400)
         .json({ success: false, error: "User doesn't exists" });
     }
+   if(user.disabled){
+    return res
+    .status(400)
+    .json({ success: false, error: "User banned" });
+   }
 
     // Validate password
     const validPassword = await bcrypt.compare(password, user.password);
