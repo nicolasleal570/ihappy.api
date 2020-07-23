@@ -94,7 +94,7 @@ router.get('/pacients', isLoggedIn, async (req, res) => {
     const { limit } = req.query;
 
     const role = await Role.findOne({ identification: 'usuario' });
-
+  
     if (!role) {
       res.status(400).json({
         success: false,
@@ -128,13 +128,48 @@ router.get('/pacients', isLoggedIn, async (req, res) => {
   }
 });
 
-// Get doctors
+// Get doctors normal user
 router.get('/doctors', isLoggedIn, async (req, res) => {
   try {
     const { limit } = req.query;
 
-    const role = await Role.findOne({ identification: 'psicologo' });
+    const role = await Role.findOne({ identification: 'psicologo'});
+  
+    if (!role) {
+      res.status(400).json({
+        success: false,
+        data: 'Role doesn\'t exists'
+      });
+    }
 
+    let doctors = [];
+    if (limit) {
+      doctors = await User.find({ role , disabled:  false}).limit(Number(limit)).populate('role').populate('speciality');
+    } else {
+      doctors = await User.find({ role , disabled : false}).populate('role').populate('speciality');
+    }
+
+
+    res.status(200).json({
+      success: true,
+      data: doctors
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error ' + err
+    });
+  }
+})
+
+// Get doctors admin user
+router.get('/doctors/admin', isLoggedIn, async (req, res) => {
+  try {
+    const { limit } = req.query;
+
+    const role = await Role.findOne({ identification: 'psicologo'});
+  
     if (!role) {
       res.status(400).json({
         success: false,
@@ -365,6 +400,47 @@ router.put('/disable/:slug', isLoggedIn, async (req, res) => {
     });
   }
 });
+
+// router.put('/disableRole/:slug', isLoggedIn, async (req, res) => {
+//   try {
+
+//     const {slug}  = req.params;
+
+//     if (!slug) {
+//       return res.status(400).json({
+//         success: false,
+//         error: 'The slug was not provide'
+//       });
+//     }
+
+//     const user = await User.findOne({ slug });
+
+//     let roleIdentification = 'psicologo';
+//     if(user.role.identification=='psicologo'){
+//       roleIdentification = 'psicologoDeshabilitado';
+//     }
+//     if(user.role.identification=='psicologoDeshabilitado'){
+//       roleIdentification = 'psicologo'
+//     }
+
+//     const role.identification = await roleIdentification
+
+//     const newUser = await User.findOneAndUpdate({ _id: user._id }, {
+//         role.identification  
+//     }, { returnOriginal: false, useFindAndModify: false });
+
+//     return res.status(200).json({
+//       success: true,
+//       data: newUser
+//     });
+
+//   } catch (err) {
+//     return res.status(500).json({
+//       success: false,
+//       error: 'Server Error ' + err
+//     });
+//   }
+// });
 
 // @desc    Update user image profile
 // @route   PUT /api/users/avatar
