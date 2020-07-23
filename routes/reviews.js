@@ -72,7 +72,7 @@ router.get('/:psychologist', isLoggedIn, async (req, res) => {
   try {
     // Psychologist slug
     const psychologist = req.params.psychologist;
-    const psicologo = await User.findOne({ slug: psychologist });
+    const psicologo = await User.findOne({ slug: psychologist }).populate('role');
 
     if (!psychologist) {
       return res
