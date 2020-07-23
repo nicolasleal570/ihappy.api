@@ -316,7 +316,8 @@ router.get('/profile/:slug', async (req, res) => {
 router.put('/profile', isLoggedIn, async (req, res) => {
   try {
     const requestedUserID = req.user;
-
+    
+   
     const {
       first_name,
       last_name,
@@ -341,9 +342,14 @@ router.put('/profile', isLoggedIn, async (req, res) => {
       { returnOriginal: false, useFindAndModify: false }
     );
 
+
+    const usuarioActualizado = await User.findById(newUser._id)
+    .populate('speciality').populate('role')
+
+
     return res.status(200).json({
       success: true,
-      data: newUser,
+      data: usuarioActualizado
     });
   } catch (err) {
     return res.status(500).json({

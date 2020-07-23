@@ -38,7 +38,7 @@ router.post('/register', async (req, res) => {
       role,
     });
 
-    user = await User.findById(user._id).populate('role');
+    user = await User.findById(user._id).populate('role').populate('speciality');
 
     // Create JWT a token
     const token = createToken(user);
